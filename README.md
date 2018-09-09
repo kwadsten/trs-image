@@ -13,9 +13,9 @@ Run from the terminal:
 1. cd /folder/to/trsimage
 2. ./trs_image_mac.py
 
---
+---
 
-###PC
+### PC
 trs\_image_pc.py
 
 **Requirements**: 
@@ -32,9 +32,9 @@ Run from the command prompt:
 
 **Example:**  python trs_image.py c:/images/a.jpg c:/images/a.bas
 
+---
 
-
-##TRS80 Instructions to run BASIC programs
+## TRS80 Instructions to run BASIC programs
 
 Using the TRS Image BASIC output file(s):
 
