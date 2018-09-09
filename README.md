@@ -1,6 +1,6 @@
-##Setup Instructions
+## Setup Instructions
 
-###Mac
+### Mac
 trs\_image_mac.py
 
 **Requirements**:
