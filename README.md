@@ -39,7 +39,7 @@ Note: This version is actually cross-platform (PC and Mac)
 
 Run from the command prompt:
 
-1. cd \folder\to\trsimage
+1. cd c:\folder\to\trsimage
 1. python trs_image_pc.py path-to-image-file path-to-output-file
 
 **Example:**  python trs_image.py c:\images\a.jpg c:\images\a.bas
