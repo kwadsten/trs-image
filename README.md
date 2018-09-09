@@ -4,18 +4,18 @@ Convert a modern image file (jpg, png, etc) into a TRS80 BASIC program to reprod
 
 Allows for source image pan, zoom, and output image contrast adjustment.  
 
-Written as an entry into Dusty's www.trs-80.org.uk 2018 Competition: HI-RES-LO
+Written as an entry into Dusty's www.trs-80.org.uk 2018 Competition: **HI-RES-LO**
 
 Target is a TRS80 Model III, LDOS 5.3.1, and Misosys LBASIC.
 
 ## Setup Instructions
 
-### Mac
+### Mac (Latest version - File Open/Save Dialog Boxes)
 trs\_image_mac.py
 
 **Requirements**:
 
-* Python 3 (python.org)
+* Python 3 (www.python.org)
 * wxpython 4.0.3 (pip install wxPython)
 
 Run from the terminal:
@@ -25,15 +25,15 @@ Run from the terminal:
 
 ---
 
-### PC
+### PC and Mac (Deprecated version - Command line input/output filenames)
 trs\_image_pc.py
 
-**Requirements**: 
+**Requirements**:
 
-* Python 3 (python.org)
-* pip (for easy install of pygame) - see https://pip.pypa.io/en/stable/installing/
+* Python 3 (www.python.org)
+* (PC) Microsoft Visual C++ 2015 Runtime [link](https://www.microsoft.com/en-us/download/details.aspx?id=53587)
+* (PC) pip (for easy install of pygame) [link](https://pip.pypa.io/en/stable/installing/)
 * PyGame 1.9.4 (pip install Pygame)
-* [Microsoft Visual C++ 2015 Runtime](https://www.microsoft.com/en-us/download/details.aspx?id=53587)
 
 Run from the command prompt:
 
