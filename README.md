@@ -25,15 +25,17 @@ Run from the terminal:
 
 ---
 
-### PC and Mac (Deprecated version - Command line input/output filenames)
+### PC (Deprecated version - Command line input/output filenames)
 trs\_image_pc.py
 
 **Requirements**:
 
 * Python 3 (www.python.org)
-* (PC) Microsoft Visual C++ 2015 Runtime [link](https://www.microsoft.com/en-us/download/details.aspx?id=53587)
-* (PC) pip (for easy install of pygame) [link](https://pip.pypa.io/en/stable/installing/)
+* Microsoft Visual C++ 2015 Runtime [link](https://www.microsoft.com/en-us/download/details.aspx?id=53587)
+* pip (for easy install of pygame) [link](https://pip.pypa.io/en/stable/installing/)
 * PyGame 1.9.4 (pip install Pygame)
+
+Note: This version is actually cross-platform (PC and Mac)
 
 Run from the command prompt:
 
