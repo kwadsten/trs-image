@@ -1,3 +1,13 @@
+### TRS Image
+
+Convert a modern image file (jpg, png, etc) into a TRS80 BASIC program to reproduce the image on a TRS80 (low-res, black and white).  
+
+Allows for source image pan, zoom, and output image contrast adjustment.  
+
+Written as an entry into Dusty's www.trs-80.org.uk 2018 Competition: HI-RES-LO
+
+Target is a TRS80 Model III, LDOS 5.3.1, and Misosys LBASIC.
+
 ## Setup Instructions
 
 ### Mac
