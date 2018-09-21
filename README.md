@@ -8,41 +8,34 @@ Written as an entry into Dusty's www.trs-80.org.uk 2018 Competition: **HI-RES-LO
 
 Target is a TRS80 Model III, LDOS 5.3.1, and Misosys LBASIC.
 
-## Setup Instructions
+## Version History
+- v1.4 
+ - Cross platform version
+ - GUI = Tk/Tcl
+ - Increase performance when adjusting contrast
+- v1.3
+ - Separate PC and Mac versions
+ - PC version uses command line parameters (no file open/save dialog boxes)
+ - GUI = wxPython
 
-### Mac (Latest version - File Open/Save Dialog Boxes)
-trs\_image_mac.py
+## Setup Instructions
 
 **Requirements**:
 
 * Python 3 (www.python.org)
-* wxpython 4.0.3 (pip install wxPython)
+* Pillow 5.2.0 (pip install Pillow)
 
+### Mac
 Run from the terminal:
 
 1. cd /folder/to/trsimage
-2. ./trs_image_mac.py
+1. ./trs_image.py
 
----
-
-### PC (Deprecated version - Command line input/output filenames)
-trs\_image_pc.py
-
-**Requirements**:
-
-* Python 3 (www.python.org)
-* Microsoft Visual C++ 2015 Runtime [link](https://www.microsoft.com/en-us/download/details.aspx?id=53587)
-* pip (for easy install of pygame) [link](https://pip.pypa.io/en/stable/installing/)
-* PyGame 1.9.4 (pip install Pygame)
-
-Note: This version is actually cross-platform (PC and Mac)
-
+### PC
 Run from the command prompt:
 
 1. cd c:\folder\to\trsimage
-1. python trs_image_pc.py path-to-image-file path-to-output-file
-
-**Example:**  python trs_image.py c:\images\a.jpg c:\images\a.bas
+1. python trs_image.py
 
 ---
 
