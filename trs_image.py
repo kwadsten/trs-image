@@ -18,8 +18,6 @@
 #        the program size (6K -> 3.5K).
 #        The user can then re-save the program back to disk to save disk space.
 #
-# Tk/Tcl version using tkinter.   Should work on Mac and PC.
-#
 # Requires: python 3, Pillow
 #
 #   pip install Pillow
@@ -37,7 +35,8 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import filedialog
 
-from PIL import Image, ImageTk, ImageDraw
+from PIL import ImageTk, ImageDraw
+import PIL.Image
 
 import os.path
 import json
@@ -108,7 +107,7 @@ class g:
                                    TRS_ACTUAL_SCREEN_SIZE.height * TRS_VIRTUAL_PIXEL_SIZE.height)
     TRS_VIRTUAL_SCREEN_RATIO = TRS_VIRTUAL_SCREEN_SIZE.width / TRS_VIRTUAL_SCREEN_SIZE.height
 
-    TRS_VIRTUAL_PIXEL_WHITE = Image.new('RGB', TRS_VIRTUAL_PIXEL_SIZE, COLOR_WHITE)
+    TRS_VIRTUAL_PIXEL_WHITE = PIL.Image.new('RGB', TRS_VIRTUAL_PIXEL_SIZE, COLOR_WHITE)
 
     # Source image display size (based on virtual trs pixel size to maintain aspect ratio)
     IMG_DISPLAY_SIZE = TRS_VIRTUAL_SCREEN_SIZE
@@ -161,8 +160,8 @@ def init(root):
     g.canvas = Canvas(root, width=g.SCREEN_SIZE.width, height=g.SCREEN_SIZE.height)
     g.canvas.pack()
 
-    g.src_display_img = Image.new('RGB', g.IMG_DISPLAY_SIZE, color='white')
-    g.trs_display_img = Image.new('RGB', g.TRS_VIRTUAL_SCREEN_SIZE, color='white')
+    g.src_display_img = PIL.Image.new('RGB', g.IMG_DISPLAY_SIZE, color='white')
+    g.trs_display_img = PIL.Image.new('RGB', g.TRS_VIRTUAL_SCREEN_SIZE, color='white')
 
     g.src_display_pi = ImageTk.PhotoImage(g.src_display_img)
     g.trs_display_pi = ImageTk.PhotoImage(g.trs_display_img)
@@ -498,7 +497,7 @@ def open_file():
 
     # Load the image into bitmap
     try:
-        g.src_original_img = Image.open(image_path)
+        g.src_original_img = PIL.Image.open(image_path)
     except IOError:
         messagebox.showerror('Error', f'Error opening {image_path}')
         return
@@ -524,7 +523,7 @@ def open_file():
     g.src_stretched_margin = Size(x * -1, y * -1)
 
     # Resize image in-place by adding white border
-    g.src_stretched_img = Image.new('RGB', (w, h), g.COLOR_WHITE)
+    g.src_stretched_img = PIL.Image.new('RGB', (w, h), g.COLOR_WHITE)
     g.src_stretched_img.paste(g.src_original_img, (x, y))
     g.src_stretched_size = Size(w, h)
 
@@ -540,6 +539,9 @@ def redraw(scope=g.REDRAW_ALL):
     """
     # Draw application screen
     # First, fill with black, then draw grey rectangle for text area
+    if scope != g.REDRAW_CONTRAST:
+        g.canvas.delete("all")
+
     g.canvas.config(background="black")
     g.canvas.create_rectangle(0, g.TEXT_DISPLAY_LOC.y, g.SCREEN_SIZE.width+3, g.SCREEN_SIZE.height+3, fill=g.COLOR_GREY)
 
@@ -564,7 +566,7 @@ def build_src_bitmap():
     :return:
     """
     # copy viewport area into new image
-    viewport_img = Image.new('RGB', g.viewport_size, g.RGB_WHITE)
+    viewport_img = PIL.Image.new('RGB', g.viewport_size, g.RGB_WHITE)
     viewport_img.paste(g.src_stretched_img, (-g.viewport_origin.x, -g.viewport_origin.y))
     viewport_img = viewport_img.resize(g.IMG_DISPLAY_SIZE)
 
@@ -576,11 +578,11 @@ def build_trs_bitmaps(scope):
     Build TRS bitmaps (actual and display) using the src_display bitmap
     :return:
     """
-    g.trs_actual_img = Image.new('RGB', g.TRS_ACTUAL_SCREEN_SIZE, g.RGB_BLACK)
+    g.trs_actual_img = PIL.Image.new('RGB', g.TRS_ACTUAL_SCREEN_SIZE, g.RGB_BLACK)
     actual_draw = ImageDraw.Draw(g.trs_actual_img)
     actual_pixels_to_draw = []
 
-    g.trs_display_img = Image.new('RGB', g.TRS_VIRTUAL_SCREEN_SIZE, g.RGB_BLACK)
+    g.trs_display_img = PIL.Image.new('RGB', g.TRS_VIRTUAL_SCREEN_SIZE, g.RGB_BLACK)
     display_draw = ImageDraw.Draw(g.trs_display_img)
 
     # Peformance - Compute average pixel colors if necessary
