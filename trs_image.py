@@ -22,8 +22,8 @@
 #
 #   pip install Pillow
 #
-# Version 1.4
-# 09/21/2018
+# Version 1.5
+# 03/16/2020
 #
 # By Kyle Wadsten
 # kwadsten@comcast.net
@@ -51,7 +51,7 @@ class g:
     """
     Global variables
     """
-    VERSION = 1.4
+    VERSION = 1.5
 
     BASIC_CURR_LINE_NB = None
 
@@ -100,6 +100,9 @@ class g:
     COLOR_GREY = 'gray'
     RGB_BLACK = (0, 0, 0)
     RGB_WHITE = (255, 255, 255)
+    
+    BG_COLOR_RGB = [RGB_BLACK, RGB_WHITE]
+    FG_COLOR = [COLOR_WHITE, COLOR_BLACK]
 
     # Virtual TRS80 screen specs (for sample image display)
     TRS_VIRTUAL_PIXEL_SIZE = Size(4, 8)
@@ -141,13 +144,16 @@ class g:
     trs_display_pi = None       # TRS image for display (canvas PhotoImage)
 
     input_uri = ''              # Input source image path
-    output_uri = ''             # Output BASIC file path
+    output_bas_uri = ''         # Output BASIC file path
+    output_tim_uri = ''         # Output TIM file path (for import into TRS-80 Screen Designer)
 
     CONFIG_FILE = 'config.ini'
     CONFIG_FOLDERS = ['', '']   # 0=input, 1=output
 
     canvas = None
     src_pixel_color_data = None
+    inverted_image = False
+    color_index = 0            # default = normal colors.  1 = inverted colors
 
 def init(root):
     """
@@ -199,8 +205,8 @@ def key_down(event):
 
     # Quit program
     if key_lower == 'q':
-        if g.input_uri != '' and g.output_uri == '':
-            messagebox.askquestion('Confirm Quit', 'Quit without generating BASIC file?', icon='warning')
+        if g.input_uri != '' and g.output_bas_uri == '':
+            messagebox.askquestion('Confirm Quit', 'Quit without generating output files?', icon='warning')
             if 'yes':
                 root.quit()
         else:
@@ -213,7 +219,7 @@ def key_down(event):
 
     # About box
     if key == 'a':
-        messagebox.showinfo('About', 'TRS Image v' + str(g.VERSION) + '\nBy Kyle Wadsten\n2018')
+        messagebox.showinfo('About', 'TRS Image v' + str(g.VERSION) + '\nBy Kyle Wadsten\n2020')
         g.canvas.focus_force()
 
     # No image adjustments allowed until image is loaded
@@ -254,16 +260,23 @@ def key_down(event):
             reset()
             redraw_flag = True
 
+        # Invert image
+        if key_lower == 'i':
+            g.color_index = 1 - g.color_index    # invert color index 0/1
+            g.inverted_image = not g.inverted_image
+            redraw_flag = True
+
         # Generate BASIC output file
         if key_lower == 'g':
-            generate_basic_file()
+            generate_bas_output_file()
+            generate_tim_output_file()
             redraw_flag = True
 
         # Regenerate source and trs images
         if redraw_flag:
             redraw()
 
-def generate_basic_file():
+def generate_bas_output_file():
     """
     Output a BASIC program for TRS80 that will recreate the image.
     Uses TRS80 'String Packing' logic.
@@ -286,10 +299,11 @@ def generate_basic_file():
     path, filename = os.path.split(g.input_uri)
     basename = os.path.splitext(filename)[0]
     cleanname = ''.join(filter(str.isalnum, basename))[:8].upper()
-    g.output_uri = os.path.join(file_dir, cleanname + ".BAS")
+    g.output_bas_uri = os.path.join(file_dir, cleanname + ".BAS")
+    g.output_tim_uri = os.path.join(file_dir, basename + ".tim")
 
     try:
-        with open(g.output_uri, 'w') as f:
+        with open(g.output_bas_uri, 'w') as f:
 
             write_basic_line(f, 'CLS')
 
@@ -358,7 +372,35 @@ def generate_basic_file():
             write_basic_line(f, 'END')
 
     except IOError as e:
-        messagebox.showerror('Error', f'Cannot save current data in file: {g.output_uri}')
+        messagebox.showerror('Error', f'Error saving data to: {g.output_bas_uri}')
+
+
+def generate_tim_output_file():
+    """
+    Generate TRS80 image file (.tim) for input into TRS-80 Screen Designer
+        by looping through each destination TRS pixel location
+        and converting each pixel to a 0 or 1
+    Output file already set by open basic file routine
+    :return:
+    """
+    
+    try:
+        with open(g.output_tim_uri, 'w') as f:
+            output_line = ''
+            
+            for y in range(0, g.TRS_ACTUAL_SCREEN_SIZE.height):
+                for x in range(0, g.TRS_ACTUAL_SCREEN_SIZE.width):
+                    # pixel_color = 0 = black, 1 = white
+                    # trs normal colors: 1=on (white), 0=off (black)
+                    pixel_color = rgb_to_bit(g.trs_actual_img, Point(x, y))
+                    output_color = 1 - pixel_color
+                    output_line += str("X" if output_color == 1 else " ")
+                    
+                f.write(output_line + '\n')
+                output_line = ''
+        
+    except IOError as e:
+        messagebox.showerror('Error', f'Error saving data to: {g.output_tim_uri}')
 
 def generate_basic_data_statements(file):
     """
@@ -439,7 +481,7 @@ def draw_instructions():
     """
     if g.input_uri != '':
         blit_text(f'  Input: {g.input_uri}', font=g.FONT_SMALL, color=g.COLOR_WHITE, pos=g.INPUT_FILE_DISPLAY_LOC)
-        blit_text(f' Output: {g.output_uri}', font=g.FONT_SMALL, color=g.COLOR_WHITE)
+        blit_text(f' Output: {g.output_bas_uri}', font=g.FONT_SMALL, color=g.COLOR_WHITE)
 
     blit_text('Arrows = Move Image', pos=Point(g.TEXT_DISPLAY_LOC.x + 50, g.TEXT_DISPLAY_LOC.y + 10)
                    )
@@ -450,7 +492,7 @@ def draw_instructions():
 
     blit_text('O = Open Image File', pos=Point(g.TEXT_DISPLAY_LOC.x + 440, g.TEXT_DISPLAY_LOC.y + 10))
     if g.input_uri != '':
-        blit_text('G = Generate BASIC File')
+        blit_text('G = Generate Output Files')
     else:
         blit_text()
 
@@ -460,6 +502,7 @@ def draw_instructions():
 
     blit_text(f'Zoom = {g.ZOOM}', pos=Point(g.TEXT_DISPLAY_LOC.x + 750, g.TEXT_DISPLAY_LOC.y + 10))
     blit_text(f'Contrast = {g.CONTRAST}')
+    blit_text(f'I = Invert Colors')
 
 def blit_text(txt=' ', font=g.FONT_BIG, color=g.COLOR_BLACK, pos=None):
     """
@@ -578,11 +621,12 @@ def build_trs_bitmaps(scope):
     Build TRS bitmaps (actual and display) using the src_display bitmap
     :return:
     """
-    g.trs_actual_img = PIL.Image.new('RGB', g.TRS_ACTUAL_SCREEN_SIZE, g.RGB_BLACK)
+    
+    g.trs_actual_img = PIL.Image.new('RGB', g.TRS_ACTUAL_SCREEN_SIZE, g.BG_COLOR_RGB[g.color_index])
     actual_draw = ImageDraw.Draw(g.trs_actual_img)
     actual_pixels_to_draw = []
 
-    g.trs_display_img = PIL.Image.new('RGB', g.TRS_VIRTUAL_SCREEN_SIZE, g.RGB_BLACK)
+    g.trs_display_img = PIL.Image.new('RGB', g.TRS_VIRTUAL_SCREEN_SIZE, g.BG_COLOR_RGB[g.color_index])
     display_draw = ImageDraw.Draw(g.trs_display_img)
 
     # Peformance - Compute average pixel colors if necessary
@@ -608,10 +652,10 @@ def build_trs_bitmaps(scope):
                 x2 = x1 + g.TRS_VIRTUAL_PIXEL_SIZE.width
                 y2 = y1 + g.TRS_VIRTUAL_PIXEL_SIZE.height
 
-                display_draw.rectangle([x1, y1, x2, y2], fill=g.COLOR_WHITE, outline=g.COLOR_WHITE)
+                display_draw.rectangle([x1, y1, x2, y2], fill=g.FG_COLOR[g.color_index], outline=g.FG_COLOR[g.color_index])
 
     # draw actual trs image pixels
-    actual_draw.point(actual_pixels_to_draw, fill=g.COLOR_WHITE)
+    actual_draw.point(actual_pixels_to_draw, fill=g.FG_COLOR[g.color_index])
     g.trs_display_pi = ImageTk.PhotoImage(g.trs_display_img)
 
 def compute_src_pixel_color_data():
@@ -744,7 +788,8 @@ def reset():
     g.viewport_size = g.src_stretched_size
     g.CONTRAST = g.DEFAULT_CONTRAST
     g.ZOOM = g.DEFAULT_ZOOM
-    g.output_uri = ''
+    g.output_bas_uri = ''
+    g.output_tim_uri = ''
 
 def read_config_file():
     """
