@@ -12,7 +12,7 @@ Target is a TRS80 Model III, LDOS 5.3.1, and Misosys LBASIC.
 - v1.5
  - Added (I)nvert colors option
  - Added .tim (TRS Image file) output file for use with TRS-80 Screen Designer (TSD)
- - See www.plaidves.com
+ - See www.plaidvest.com
 - v1.4 
  - Cross platform version
  - GUI = Tk/Tcl
